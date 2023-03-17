@@ -161,7 +161,7 @@ pub struct Function {
 /// - `uprobe.s+` or `uretprobe.s+`
 /// - `usdt+`
 /// - `kprobe.multi+` or `kretprobe.multi+`: `BPF_TRACE_KPROBE_MULTI`
-/// - `lsm_cgroup+` or `lsm.s+`
+/// - `lsm_cgroup+`
 /// - `lwt_in`, `lwt_out`, `lwt_seg6local`, `lwt_xmit`
 /// - `raw_tp.w+`, `raw_tracepoint.w+`
 /// - `action`
@@ -490,7 +490,7 @@ impl FromStr for ProgramSection {
                 name,
                 sleepable_supported: false,
             },
-            "lsm.s+" => Lsm {
+            "lsm.s" => Lsm {
                 name,
                 sleepable_supported: true,
             },
@@ -1979,7 +1979,7 @@ mod tests {
         assert_matches!(
             obj.parse_section(fake_section(
                 BpfSectionKind::Program,
-                "lsm.s+/foo",
+                "lsm.s/foo",
                 bytes_of(&fake_ins())
             )),
             Ok(())
