@@ -244,6 +244,7 @@ pub enum ProgramSection {
     },
     Lsm {
         name: String,
+        sleepable_supported: bool,
     },
     BtfTracePoint {
         name: String,
@@ -294,7 +295,7 @@ impl ProgramSection {
             ProgramSection::LircMode2 { name } => name,
             ProgramSection::PerfEvent { name } => name,
             ProgramSection::RawTracePoint { name } => name,
-            ProgramSection::Lsm { name } => name,
+            ProgramSection::Lsm { name, .. } => name,
             ProgramSection::BtfTracePoint { name } => name,
             ProgramSection::FEntry { name } => name,
             ProgramSection::FExit { name } => name,
@@ -485,7 +486,14 @@ impl FromStr for ProgramSection {
             "lirc_mode2" => LircMode2 { name },
             "perf_event" => PerfEvent { name },
             "raw_tp" | "raw_tracepoint" => RawTracePoint { name },
-            "lsm" => Lsm { name },
+            "lsm" => Lsm {
+                name,
+                sleepable_supported: false,
+            },
+            "lsm.s+" => Lsm {
+                name,
+                sleepable_supported: true,
+            },
             "fentry" => FEntry { name },
             "fexit" => FExit { name },
             "freplace" => Extension { name },
@@ -1959,6 +1967,30 @@ mod tests {
             obj.programs.get("foo"),
             Some(Program {
                 section: ProgramSection::Lsm { .. },
+                ..
+            })
+        );
+    }
+
+    #[test]
+    fn test_parse_section_lsm_sleepable() {
+        let mut obj = fake_obj();
+
+        assert_matches!(
+            obj.parse_section(fake_section(
+                BpfSectionKind::Program,
+                "lsm.s+/foo",
+                bytes_of(&fake_ins())
+            )),
+            Ok(())
+        );
+        assert_matches!(
+            obj.programs.get("foo"),
+            Some(Program {
+                section: ProgramSection::Lsm {
+                    sleepable_supported: true,
+                    ..
+                },
                 ..
             })
         );
