@@ -58,6 +58,9 @@ pub trait BpfContext {
 
 #[no_mangle]
 pub unsafe extern "C" fn memset(s: *mut u8, c: c_int, n: usize) -> u8 {
+    if s.is_null() {
+        return 0;
+    }
     let base = s as usize;
     for i in 0..n {
         *((base + i) as *mut u8) = c as u8;
