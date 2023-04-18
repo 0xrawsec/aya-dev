@@ -57,6 +57,7 @@ pub trait BpfContext {
 }
 
 #[no_mangle]
+#[inline(always)]
 pub unsafe extern "C" fn memset(s: *mut u8, c: c_int, n: usize) -> u8 {
     if s.is_null() {
         return 0;
