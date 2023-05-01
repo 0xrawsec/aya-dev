@@ -871,7 +871,7 @@ impl ComputedRelocation {
         let instructions = &mut program.function.instructions;
         let num_instructions = instructions.len();
         let ins_index = rel.ins_offset / mem::size_of::<bpf_insn>();
-        let mut ins =
+        let ins =
             instructions
                 .get_mut(ins_index)
                 .ok_or(RelocationError::InvalidInstructionIndex {
@@ -971,7 +971,7 @@ impl ComputedRelocation {
             }
             BPF_LD => {
                 ins.imm = target_value as i32;
-                let mut next_ins = instructions.get_mut(ins_index + 1).ok_or(
+                let next_ins = instructions.get_mut(ins_index + 1).ok_or(
                     RelocationError::InvalidInstructionIndex {
                         index: ins_index + 1,
                         num_instructions,
